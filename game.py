@@ -4,41 +4,31 @@ from ball import Ball
 from config import *
 
 class Game:
-    """
-    Controla a lógica principal do jogo.
-    """
 
     def __init__(self, screen):
 
         self.screen = screen
+
+        self.player = Player(30, SCREEN_HEIGHT // 2)
+        self.bot = Player(SCREEN_WIDTH - 40, SCREEN_HEIGHT // 2)
+
+        self.ball = Ball(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+
         self.clock = pygame.time.Clock()
-
-        self.player = Player(
-            15,
-            SCREEN_HEIGHT // 2 - PADDLE_HEIGHT // 2
-        )
-
-        self.bot = Player(
-            SCREEN_WIDTH - 25,
-            SCREEN_HEIGHT // 2 - PADDLE_HEIGHT // 2
-        )
-
-        self.ball = Ball(
-            SCREEN_WIDTH // 2,
-            SCREEN_HEIGHT // 2
-        )
+        self.running = True
 
         self.score_player = 0
         self.score_bot = 0
 
-        self.font = pygame.font.SysFont(None, 36)
+        self.game_started = False
 
-    def reset_ball(self):
+        pygame.mixer.init()
 
-        self.ball.x = SCREEN_WIDTH // 2
-        self.ball.y = SCREEN_HEIGHT // 2
+        # sons
+        self.paddle_sound = pygame.mixer.Sound("assets/sounds/bola.wav")
+        self.score_sound = pygame.mixer.Sound("assets/sounds/win.wav")
 
-        self.ball.speed_x *= -1
+        self.font = pygame.font.Font(None, 50)
 
     def handle_input(self):
 
@@ -52,38 +42,56 @@ class Game:
 
     def update(self):
 
+        if not self.game_started:
+            return
+
         self.ball.move()
 
-        # colisão com jogador
-        if self.ball.get_rect().colliderect(
-                self.player.get_rect()):
-            self.ball.speed_x *= -1
-
-        # colisão com bot
-        if self.ball.get_rect().colliderect(
-                self.bot.get_rect()):
-            self.ball.speed_x *= -1
-
-        # ponto para bot
-        if self.ball.x <= 0:
-            self.score_bot += 1
-            self.reset_ball()
-
-        # ponto para player
-        if self.ball.x >= SCREEN_WIDTH:
-            self.score_player += 1
-            self.reset_ball()
-
         # IA do bot
-        if self.bot.y + self.bot.height // 2 < self.ball.y:
+        if self.bot.y < self.ball.y:
             self.bot.move_down()
 
-        elif self.bot.y + self.bot.height // 2 > self.ball.y:
+        if self.bot.y > self.ball.y:
             self.bot.move_up()
+
+        # colisão jogador
+        if self.ball.get_rect().colliderect(self.player.get_rect()):
+            self.ball.speed_x *= -1
+            self.paddle_sound.play()
+
+        # colisão bot
+        if self.ball.get_rect().colliderect(self.bot.get_rect()):
+            self.ball.speed_x *= -1
+            self.paddle_sound.play()
+
+        # colisão parede
+        if self.ball.y <= 0 or self.ball.y >= SCREEN_HEIGHT:
+            self.ball.speed_y *= -1
+
+        # ponto bot
+        if self.ball.x <= 0:
+            self.score_bot += 1
+            self.score_sound.play()
+            self.ball.reset()
+
+        # ponto player
+        if self.ball.x >= SCREEN_WIDTH:
+            self.score_player += 1
+            self.score_sound.play()
+            self.ball.reset()
 
     def draw(self):
 
         self.screen.fill(BLACK)
+
+        # linha do meio
+        pygame.draw.line(
+            self.screen,
+            WHITE,
+            (SCREEN_WIDTH // 2, 0),
+            (SCREEN_WIDTH // 2, SCREEN_HEIGHT),
+            2
+        )
 
         self.player.draw(self.screen)
         self.bot.draw(self.screen)
@@ -91,28 +99,47 @@ class Game:
 
         # placar
         score_text = self.font.render(
-            f"{self.score_player} - {self.score_bot}",
+            f"{self.score_player}   {self.score_bot}",
             True,
             WHITE
         )
 
         self.screen.blit(
             score_text,
-            (SCREEN_WIDTH // 2 - 30, 20)
+            (SCREEN_WIDTH // 2 - 40, 20)
         )
+
+        # tela inicial
+        if not self.game_started:
+
+            start_text = self.font.render(
+                "Press SPACE to start",
+                True,
+                WHITE
+            )
+
+            self.screen.blit(
+                start_text,
+                (
+                    SCREEN_WIDTH // 2 - 150,
+                    SCREEN_HEIGHT // 2
+                )
+            )
 
         pygame.display.flip()
 
     def run(self):
 
-        running = True
-
-        while running:
+        while self.running:
 
             for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.game_started = True
 
             self.handle_input()
             self.update()
