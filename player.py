@@ -2,9 +2,7 @@ import pygame
 from config import *
 
 class Player:
-    """
-    Representa uma raquete do jogo Pong.
-    """
+
 
     def __init__(self, x, y):
         self.x = x
