@@ -1,4 +1,5 @@
 import pygame
+import random
 from player import Player
 from ball import Ball
 from config import *
@@ -24,7 +25,6 @@ class Game:
 
         pygame.mixer.init()
 
-        # sons
         self.paddle_sound = pygame.mixer.Sound("assets/sounds/bola.wav")
         self.score_sound = pygame.mixer.Sound("assets/sounds/win.wav")
 
@@ -56,26 +56,42 @@ class Game:
 
         # colisão jogador
         if self.ball.get_rect().colliderect(self.player.get_rect()):
+
             self.ball.speed_x *= -1
+
+            # variação aleatória no ângulo
+            self.ball.speed_y += random.uniform(-2, 2)
+
             self.paddle_sound.play()
 
         # colisão bot
         if self.ball.get_rect().colliderect(self.bot.get_rect()):
+
             self.ball.speed_x *= -1
+
+            # variação aleatória no ângulo
+            self.ball.speed_y += random.uniform(-2, 2)
+
             self.paddle_sound.play()
 
         # colisão parede
         if self.ball.y <= 0 or self.ball.y >= SCREEN_HEIGHT:
+
             self.ball.speed_y *= -1
+
+            # pequena variação
+            self.ball.speed_x += random.uniform(-1, 1)
 
         # ponto bot
         if self.ball.x <= 0:
+
             self.score_bot += 1
             self.score_sound.play()
             self.ball.reset()
 
         # ponto player
         if self.ball.x >= SCREEN_WIDTH:
+
             self.score_player += 1
             self.score_sound.play()
             self.ball.reset()
@@ -84,7 +100,6 @@ class Game:
 
         self.screen.fill(BLACK)
 
-        # linha do meio
         pygame.draw.line(
             self.screen,
             WHITE,
@@ -97,7 +112,6 @@ class Game:
         self.bot.draw(self.screen)
         self.ball.draw(self.screen)
 
-        # placar
         score_text = self.font.render(
             f"{self.score_player}   {self.score_bot}",
             True,
@@ -109,7 +123,6 @@ class Game:
             (SCREEN_WIDTH // 2 - 40, 20)
         )
 
-        # tela inicial
         if not self.game_started:
 
             start_text = self.font.render(
