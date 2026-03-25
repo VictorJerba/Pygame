@@ -1,71 +1,168 @@
-# Projeto Pygame – Colisão de Bolas
+# Pong com Pygame
 
-## O que é esse projeto
+Projeto desenvolvido para a disciplina de **Computação Gráfica e Tecnologias Imersivas** utilizando a biblioteca **Pygame** em Python.
 
-Este é um programa simples feito em **Python usando Pygame**.
-
-Ele mostra **duas bolas se movendo na tela**.
-As bolas:
-
-* se movimentam pela tela
-* quicam nas paredes
-* mudam de direção quando se encostam
-
-A ideia é simular um movimento parecido com o **DVD screensaver**.
+O objetivo do projeto é implementar e evoluir um jogo clássico de **Pong**, aplicando conceitos de **refatoração de código, organização de classes, princípios SOLID e versionamento com Git**.
 
 ---
 
-## Objetivo do exercício
+# Estrutura do Projeto
 
-Praticar alguns conceitos básicos de programação gráfica:
+```
+Pygame/
+│
+├── main.py
+├── game.py
+├── player.py
+├── ball.py
+├── config.py
+│
+└── assets/
+    └── sounds/
+        ├── bola.wav
+        └── win.wav
+```
 
-* movimentação de objetos
+Descrição dos arquivos:
+
+* **main.py** → ponto de entrada do jogo
+* **game.py** → lógica principal do jogo
+* **player.py** → controle das raquetes
+* **ball.py** → comportamento da bola
+* **config.py** → constantes do jogo (cores, tamanho da tela, velocidade etc.)
+* **assets/sounds** → arquivos de áudio utilizados no jogo
+
+---
+
+# Refatoração do Código
+
+O projeto foi refatorado para melhorar:
+
+* Organização do código
+* Separação de responsabilidades
+* Legibilidade
+* Manutenção
+* Escalabilidade
+
+Cada elemento do jogo foi separado em **classes específicas**.
+
+### Classes principais
+
+**Game**
+Responsável por controlar:
+
+* Loop principal do jogo
+* Atualização da lógica
+* Renderização na tela
+* Controle de pontuação
+* Eventos de teclado
+
+**Player**
+
+Responsável pela raquete do jogador.
+
+Funções principais:
+
+* movimentação
+* renderização na tela
 * detecção de colisão
-* uso de loop principal
-* uso da biblioteca Pygame
+
+**Ball**
+
+Responsável pelo comportamento da bola:
+
+* movimento
+* colisões
+* reinício da posição após pontuação
 
 ---
 
-## O que é necessário para rodar
+# Task 1 — Feedback Sonoro e Áudio
 
-* Python instalado
-* Biblioteca **pygame**
+Nesta etapa foi implementado um sistema de **feedback sonoro para melhorar a experiência do jogador**.
 
-Instalar pygame:
+### Funcionalidades adicionadas
+
+1. **Som de colisão**
+
+Quando a bola colide com as raquetes, um efeito sonoro é reproduzido.
 
 ```
-pip install pygame
+self.paddle_sound.play()
+```
+
+Isso melhora o feedback do jogador durante a gameplay.
+
+---
+
+2. **Som de pontuação**
+
+Quando um jogador marca ponto, um som específico é executado.
+
+```
+self.score_sound.play()
+```
+
+Além disso, a bola é reiniciada no centro da tela.
+
+---
+
+3. **Carregamento dos sons**
+
+Os efeitos sonoros são carregados utilizando o módulo **pygame.mixer**.
+
+```
+pygame.mixer.init()
+
+self.paddle_sound = pygame.mixer.Sound("assets/sounds/bola.wav")
+self.score_sound = pygame.mixer.Sound("assets/sounds/win.wav")
 ```
 
 ---
 
-## Como executar o programa
+# Controle do Jogo
 
-1. Abra o terminal na pasta do projeto
-2. Execute o arquivo Python
-
-```
-python teste-pygame.py
-```
-
-Se tudo estiver certo, abrirá uma janela mostrando **duas bolas se movendo e colidindo**.
+* **Seta para cima** → mover raquete para cima
+* **Seta para baixo** → mover raquete para baixo
+* **SPACE** → iniciar o jogo
 
 ---
 
-## Estrutura simples do programa
+# Princípios aplicados
 
-O código faz basicamente isso:
+Durante o refatoramento foram aplicados conceitos de **SOLID**, principalmente:
 
-1. cria a janela do jogo
-2. define posição das duas bolas
-3. move as bolas a cada frame
-4. verifica colisão com as paredes
-5. verifica colisão entre as bolas
-6. desenha tudo na tela
+**Single Responsibility Principle**
+
+Cada classe possui apenas uma responsabilidade:
+
+* Game → controle do jogo
+* Player → controle da raquete
+* Ball → comportamento da bola
+
+Isso torna o código mais organizado e fácil de manter.
 
 ---
 
-## Autor
-Victor Gustavo Jerba
+# Tecnologias utilizadas
 
-Projeto desenvolvido para estudo de **Pygame e colisão de objetos**.
+* Python
+* Pygame
+* Git
+* GitHub
+
+---
+
+# Execução do Projeto
+
+Para rodar o projeto:
+
+```
+python main.py
+```
+
+---
+
+# Autor Victor Gustavo Jerba :D
+
+Projeto desenvolvido como atividade acadêmica para a disciplina de **Computação Gráfica e Tecnologias Imersivas**.
